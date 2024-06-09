@@ -34,10 +34,10 @@ def _load_model(checkpoint_path, device="cuda", precision=torch.bfloat16):
         simple_quantizer = WeightOnlyInt4QuantHandler(model, groupsize)
         model = simple_quantizer.convert_for_runtime()
 
-    checkpoint = torch.load(str(checkpoint_path), mmap=True, weights_only=True)
+    checkpoint = torch.load(str(checkpoint_path), weights_only=True)
     model.load_state_dict(checkpoint, assign=True)
 
-
+    print("Device: ", device, " Precision: ", precision)
     model = model.to(device=device, dtype=precision)
     return model.eval()
 

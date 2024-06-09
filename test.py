@@ -1,20 +1,24 @@
-from eagle.model.ea_model import EaModel
+from model.ea_model import EaModel
 from fastchat.model import get_conversation_template
 import torch
 import time
 
-base_model_path = "/home/ubuntu/model_input/llama-2-7b-chat-hf"
-eagle_model_path = "/home/ubuntu/model_input/eagle-llama2"
+base_model_path = "/home/ubuntu/model_input/llama-2-7b-chat-hf/model_int4.g32.pth"
+eagle_model_path = "/home/ubuntu/model_input/eagle-llama2/model_int4.g32.pth"
 
 model = EaModel.from_pretrained(
     base_model_path=base_model_path,
     ea_model_path=eagle_model_path,
-    torch_dtype=torch.float16,
+    torch_dtype=torch.bfloat16,
     low_cpu_mem_usage=True,
     device_map="cuda"
 )
 
 model.eval()
+
+model.draft_one=torch.compile(model.draft_one, mode="reduce-overhead", fullgraph=True,dynamic=False)
+model.base_forward=torch.compile(model.base_forward, mode="reduce-overhead", fullgraph=True,dynamic=False)
+model.base_forward_one=torch.compile(model.base_forward_one, mode="reduce-overhead", fullgraph=True)
 
 your_message="Hello"
 
@@ -29,10 +33,10 @@ for _ in range(10):
     st = time.time()
     input_ids=model.tokenizer([prompt]).input_ids
     input_ids = torch.as_tensor(input_ids).cuda()
-    output_ids=model.eagenerate(input_ids,temperature=0.5,max_new_tokens=512)
+    output_ids=model.eagenerate(input_ids,temperature=0,max_new_tokens=512)
     output=model.tokenizer.decode(output_ids[0])
     et = time.time()
 
-    out_tokens = len(model.tokenizer.encode(output)) - len(model.tokenizer.encode(prompt))
+    out_tokens = len(model.tokenizer.encode(output))
     print(et-st, out_tokens, out_tokens/(et-st))
     # print(output)

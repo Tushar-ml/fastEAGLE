@@ -8,7 +8,7 @@ import os
 from .cnets import Model
 from .configs import EConfig
 from huggingface_hub import hf_hub_download
-from .llama_fast0 import Transformer as llamafast
+from .llama_fast import Transformer as llamafast
 from .eagle_fast import EAGLE as eaglefast,find_multiple
 from pathlib import Path
 from .choices import mc_sim_7b_63

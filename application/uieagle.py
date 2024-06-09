@@ -10,10 +10,10 @@ from fastchat.model import get_conversation_template
 import re
 
 
-torch._inductor.config.coordinate_descent_tuning = True
-torch._inductor.config.triton.unique_kernel_names = True
-torch._inductor.config.fx_graph_cache = True # Experimental feature to reduce compilation times, will be on by default in future
-torch._dynamo.config.cache_size_limit=64
+# torch._inductor.config.coordinate_descent_tuning = True
+# torch._inductor.config.triton.unique_kernel_names = True
+# torch._inductor.config.fx_graph_cache = True # Experimental feature to reduce compilation times, will be on by default in future
+# torch._dynamo.config.cache_size_limit=64
 
 
 def truncate_list(lst, num):
