@@ -23,15 +23,22 @@ def convert_hf_checkpoint(
     *,
     checkpoint_dir: Path = Path("checkpoints/meta-Transformer/Transformer-2-7b-chat-hf"),
     model_name: Optional[str] = None,
+    load_safetensors: bool = True
 ) -> None:
+    
     if model_name is None:
         model_name = checkpoint_dir.name
 
+    print("Model Name: ", model_name)
     config = ModelArgs.from_config(str(checkpoint_dir))
     print(f"Model config {config.__dict__}")
 
     # Load the json file containing weight mapping
-    model_map_json = checkpoint_dir / "pytorch_model.bin.index.json"
+
+    if load_safetensors:
+        model_map_json = checkpoint_dir / "model.safetensors.index.json"
+    else:
+        model_map_json = checkpoint_dir / "pytorch_model.bin.index.json"
 
     assert model_map_json.is_file()
 
@@ -65,7 +72,12 @@ def convert_hf_checkpoint(
 
     merged_result = {}
     for file in sorted(bin_files):
-        state_dict = torch.load(str(file), map_location="cpu", mmap=True, weights_only=True)
+        if load_safetensors:
+            from safetensors.torch import load_file
+            state_dict = load_file(str(file), device="cpu")
+        else:
+            state_dict = torch.load(str(file), map_location="cpu", weights_only=True)
+        
         merged_result.update(state_dict)
     final_result = {}
     for key, value in merged_result.items():
@@ -92,6 +104,7 @@ def convert_hf_checkpoint(
             del final_result[key]
             del final_result[key.replace("wq", "wk")]
             del final_result[key.replace("wq", "wv")]
+    
     print(f"Saving checkpoint to {checkpoint_dir / 'model.pth'}")
     torch.save(final_result, checkpoint_dir / "model.pth")
 
@@ -101,9 +114,11 @@ if __name__ == '__main__':
     parser.add_argument('--checkpoint_dir', type=Path, default=Path("/home/lyh/weights/hf/llama2chat/13B/"))
     # parser.add_argument('--checkpoint_dir', type=Path, default=Path("/home/lyh/weights/hf/vicuna_v13/33B/"))
     parser.add_argument('--model_name', type=str, default=None)
+    parser.add_argument("--load-safetensors", type=bool, default=True)
 
     args = parser.parse_args()
     convert_hf_checkpoint(
         checkpoint_dir=args.checkpoint_dir,
         model_name=args.model_name,
+        load_safetensors=args.load_safetensors
     )

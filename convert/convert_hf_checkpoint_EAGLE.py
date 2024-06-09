@@ -50,13 +50,6 @@ def convert_hf_checkpoint(
     config = ModelArgs.from_config(str(checkpoint_dir))
     print(f"Model config {config.__dict__}")
 
-    # Load the json file containing weight mapping
-    #model_map_json = checkpoint_dir / "pytorch_model.bin.index.json"
-
-    # assert model_map_json.is_file()
-    #
-    # with open(model_map_json) as json_map:
-    #     bin_index = json.load(json_map)
 
     weight_map = {
         "model.embed_tokens.weight": "tok_embeddings.weight",
@@ -123,9 +116,8 @@ def convert_hf_checkpoint(
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Convert HuggingFace checkpoint.')
-    parser.add_argument('--checkpoint_dir', type=Path, default=Path("/home/lyh/weights/hf/eagle/llama2chat/13B/"))
-    parser.add_argument('--base_dir', type=Path, default=Path("/home/lyh/weights/hf/llama2chat/13B/"))
-    # parser.add_argument('--checkpoint_dir', type=Path, default=Path("/home/lyh/weights/hf/llama2chat/7B/"))
+    parser.add_argument('--checkpoint_dir', type=Path, default=None)
+    parser.add_argument('--base_dir', type=Path, default=None)
     parser.add_argument('--model_name', type=str, default=None)
 
     args = parser.parse_args()
