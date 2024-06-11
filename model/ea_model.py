@@ -357,8 +357,6 @@ class EaModel(nn.Module):
         # max_block_size = min(max_length, max_new_tokens + input_len+10)
         max_block_size = max_length
         max_block_size = find_multiple(max_block_size, 8)
-
-        print(max_block_size)
         # from IPython import embed
         # embed()
 
@@ -368,7 +366,6 @@ class EaModel(nn.Module):
 
         else:
 
-            # print("!!!!!!!!!!!")
             causal_mask = torch.tril(
                 torch.ones(max_block_size, max_block_size, dtype=torch.bool, device=device))
             self.causal_mask = causal_mask

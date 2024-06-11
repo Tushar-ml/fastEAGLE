@@ -13,7 +13,6 @@ from torch import Tensor
 from torch.nn import functional as F
 from pathlib import Path
 
-
 def _load_model(checkpoint_path, device="cuda", precision=torch.bfloat16,bias=True):
     path=Path(checkpoint_path)
     checkpoint_path = path
@@ -240,9 +239,7 @@ class Attention(nn.Module):
         k = k.repeat_interleave(self.n_head // self.n_local_heads, dim=1)
         v = v.repeat_interleave(self.n_head // self.n_local_heads, dim=1)
         y = F.scaled_dot_product_attention(q, k, v, attn_mask=mask, dropout_p=0.0)
-
         y = y.transpose(1, 2).contiguous().view(bsz, seqlen, self.dim)
-
         y = self.wo(y)
         return y
 

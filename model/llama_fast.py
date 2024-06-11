@@ -93,9 +93,11 @@ class ModelArgs:
             "n_head":config['num_attention_heads'],
             "dim":config['hidden_size'],
             "intermediate_size":config['intermediate_size'],
+            "vocab_size": config["vocab_size"]
         }
         if "num_key_value_heads" in config:
             dic["n_local_heads"]=config["num_key_value_heads"]
+        print(dic)
         return cls(**dic)
 
 
